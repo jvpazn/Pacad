@@ -1,0 +1,12 @@
+{
+  "name": "presenca-e-companhia-v3",
+  "version": "3.0.0",
+  "description": "Prot\u00f3tipo com fluxo de presen\u00e7a via QR",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
