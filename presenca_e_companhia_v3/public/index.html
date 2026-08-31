@@ -1,240 +1,601 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Presença e Companhia</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Pacad</title>
     <style>
-        /* CSS Reset e Configurações Globais */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #e0e5ec; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        
-        .app-container {
-            width: 100%; max-width: 414px; height: 100vh; max-height: 896px;
-            background-color: #ffffff; position: relative; display: flex;
-            flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden;
-        }
+      /* style.css do Pacad — reescrito para casar com as classes reais do HTML.
+         O bug original: o CSS estilizava .box/.login-box/.container, mas o
+         HTML usa .screen/.top-header/.class-card/.bottom-nav/etc. Como
+         nenhuma dessas classes reais tinha display:none/active, as 6 telas
+         ficavam todas visíveis, empilhadas, na mesma página. */
 
-        .screen { display: none; height: 100%; width: 100%; flex-direction: column; position: relative; }
-        .screen.active { display: flex; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
 
-        /* ================= TELA DE LOGIN & CADASTRO ================= */
-        .auth-screen { padding: 40px 30px; align-items: center; background-color: white; z-index: 2; flex: 1; }
-        .avatar-circle { width: 140px; height: 140px; background-color: #3e9bf9; border-radius: 50%; margin: 20px auto 40px; display: flex; justify-content: center; align-items: center; position: relative; }
-        .avatar-circle::before { content: ''; width: 50px; height: 50px; background-color: white; border-radius: 50%; position: absolute; top: 25px; }
-        .avatar-circle::after { content: ''; width: 90px; height: 45px; background-color: white; border-top-left-radius: 45px; border-top-right-radius: 45px; position: absolute; bottom: 15px; }
-        .auth-title { font-size: 24px; color: #333; margin-bottom: 20px; font-weight: normal; }
-        .input-group { width: 100%; margin-bottom: 20px; }
-        .input-group input { width: 100%; padding: 14px 20px; border: 2px solid #003366; border-radius: 30px; font-size: 16px; outline: none; color: #333; }
-        .forgot-pass { color: #003366; font-weight: bold; margin-bottom: 25px; cursor: pointer; text-align: center; font-size: 15px;}
-        .btn-blue { background-color: #3e9bf9; color: white; border: none; border-radius: 30px; padding: 15px; width: 100%; font-size: 22px; cursor: pointer; font-family: 'Arial Narrow', sans-serif; }
-        .register-link { margin-top: 15px; font-size: 14px; color: #003366; font-weight: bold; text-align: center; cursor: pointer; }
-        .ifpe-footer-bg { height: 200px; width: 100%; background: linear-gradient(to right, #4b7db3, #a1c4db); position: absolute; bottom: 0; left: 0; z-index: 1; border-top-left-radius: 100px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 20px; }
-        .ifpe-footer-bg::before { content: 'PE'; font-size: 40px; font-weight: bold; color: white; opacity: 0.5; }
+      html,
+      body {
+        height: 100%;
+      }
 
-        /* ================= TELAS INTERNAS ================= */
-        .top-header { background-color: #fff; text-align: center; padding: 15px; border-bottom: 2px solid #f0f0f0; }
-        .top-header h1 { font-size: 18px; color: #333; font-weight: normal; }
-        .top-header .subtitle { font-size: 22px; color: #333; margin-top: 5px; font-weight: normal;}
-        .top-header.blue-header { background-color: #3e9bf9; color: white; border-bottom: none; }
-        .top-header.blue-header h1, .top-header.blue-header .subtitle { color: white; }
-        .content-area { flex: 1; overflow-y: auto; background-color: #fff; padding: 20px; }
+      body {
+        background-color: #e0e5ec;
+        color: #333;
+      }
 
-        /* Home Elements */
-        .date-box { background: #e0e0e0; display: inline-block; padding: 5px 15px; font-weight: bold; color: #ff0000; margin-bottom: 20px; }
-        .home-title { font-size: 18px; margin-bottom: 15px; color: #333;}
-        .class-card { background: #f5f5f5; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.05);}
-        .btn-scan { background-color: #333; color: white; border: none; border-radius: 5px; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+      .app-container {
+        max-width: 480px;
+        margin: 0 auto;
+        min-height: 100vh;
+        background: #e0e5ec;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+        position: relative;
+      }
 
-        /* ================= CHECK-IN FLOW (Layout "Sem Cores/Wireframe") ================= */
-        /* Usando tons de cinza e bordas marcadas para focar no layout estrutural conforme pedido */
-        .checkin-container { padding: 10px 0; font-family: monospace; }
-        .flow-step { display: none; margin-bottom: 15px; border: 2px solid #555; background: #fafafa; padding: 15px; border-radius: 4px; position: relative; }
-        .flow-step.visible { display: block; animation: fadeIn 0.5s; }
-        .flow-arrow { text-align: center; font-size: 24px; color: #555; margin: -10px 0 5px 0; display: none; }
-        .flow-arrow.visible { display: block; animation: fadeIn 0.5s; }
-        
-        .step-title { font-weight: bold; font-size: 14px; color: #000; border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-bottom: 8px; text-transform: uppercase; }
-        .step-content { font-size: 13px; color: #333; display: flex; flex-direction: column; gap: 5px; }
-        .check-item { display: flex; justify-content: space-between; border: 1px solid #eee; padding: 4px 8px; background: #fff;}
-        .check-item span.status { font-weight: bold; color: #555; }
-        
-        .score-box { text-align: center; font-size: 20px; font-weight: bold; padding: 10px; background: #eee; border: 1px solid #ccc; margin-top: 5px; }
-        .result-box { text-align: center; font-size: 18px; font-weight: bold; padding: 15px; color: #fff; text-transform: uppercase; }
-        .result-ok { background-color: #444; }
-        .result-suspect { background-color: #888; border: 2px dashed #000;}
+      /* ---- MOTOR DE TELAS: aqui estava o bug ---- */
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+      /* ---- TELA DE LOGIN ---- */
+      #screen-login.active {
+        justify-content: center;
+        align-items: center;
+        padding: 30px 20px;
+        background: linear-gradient(160deg, #3e9bf9 0%, #e0e5ec 45%);
+      }
 
-        /* Bottom Nav */
-        .bottom-nav { display: flex; background-color: #f8f8f8; border-top: 1px solid #ddd; height: 60px; justify-content: space-around; align-items: center; }
-        .nav-item { flex: 1; text-align: center; font-size: 12px; color: #666; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
-        .nav-item:hover, .nav-item.active-nav { color: #3e9bf9; font-weight: bold; background-color: #f0f0f0; }
+      .auth-screen {
+        background: #ffffff;
+        padding: 40px 30px;
+        width: 100%;
+        max-width: 340px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .avatar-circle {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        margin-bottom: 24px;
+        background: linear-gradient(135deg, #3e9bf9, #003366);
+        box-shadow: 0 4px 12px rgba(0, 51, 102, 0.3);
+      }
+
+      .input-group {
+        width: 100%;
+      }
+
+      input {
+        width: 100%;
+        padding: 14px 20px;
+        border: 2px solid #003366;
+        border-radius: 30px;
+        font-size: 15px;
+        outline: none;
+        color: #333;
+        margin-bottom: 12px;
+      }
+
+      .forgot-pass {
+        align-self: flex-end;
+        font-size: 12px;
+        color: #003366;
+        cursor: pointer;
+        margin-bottom: 20px;
+      }
+
+      button {
+        background-color: #3e9bf9;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 15px;
+        width: 100%;
+        font-size: 16px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #2b84e0;
+      }
+
+      .register-link {
+        margin-top: 18px;
+        font-size: 13px;
+        color: #003366;
+        text-align: center;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .ifpe-footer-bg {
+        margin-top: auto;
+        height: 10px;
+        width: 100%;
+        background: #003366;
+      }
+
+      /* ---- CABEÇALHO PADRÃO (home + telas internas) ---- */
+      .top-header,
+      .blue-header {
+        background-color: #3e9bf9;
+        color: white;
+        padding: 22px 20px 18px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .top-header h1,
+      .blue-header h1 {
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      .subtitle {
+        font-size: 13px;
+        opacity: 0.9;
+        margin-top: 4px;
+      }
+
+      .content-area {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .date-box {
+        display: inline-block;
+        background: #ffffff;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        color: #555;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        margin-bottom: 16px;
+      }
+
+      .btn-scan {
+        margin-bottom: 20px;
+      }
+
+      .home-title {
+        font-size: 16px;
+        color: #333;
+        margin: 8px 0 12px;
+      }
+
+      .class-card {
+        background: #ffffff;
+        border-left: 4px solid #3e9bf9;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .class-card h3 {
+        font-size: 15px;
+        color: #003366;
+        margin-bottom: 4px;
+      }
+
+      .class-card p {
+        font-size: 13px;
+        color: #666;
+      }
+
+      .bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        background: #ffffff;
+        padding: 14px 6px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-item {
+        font-size: 12px;
+        color: #003366;
+        text-align: center;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+      }
+
+      .nav-item:hover {
+        background-color: #e0e5ec;
+      }
+
+      /* ---- FLUXO DE CHECK-IN ---- */
+      .checkin-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .flow-step {
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 14px 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        opacity: 0;
+        transform: translateY(10px);
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+      }
+
+      .flow-step.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .step-title {
+        font-weight: bold;
+        font-size: 13px;
+        color: #003366;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+      }
+
+      .step-content {
+        font-size: 13px;
+        color: #444;
+        font-family: "Courier New", monospace;
+      }
+
+      .check-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 3px 0;
+      }
+
+      .status {
+        font-weight: bold;
+        color: #888;
+      }
+
+      .score-box {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 8px;
+        color: #333;
+      }
+
+      .flow-arrow {
+        text-align: center;
+        font-size: 18px;
+        color: #999;
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .flow-arrow.visible {
+        height: auto;
+        opacity: 1;
+        margin: 2px 0;
+      }
+
+      .result-box {
+        text-align: center;
+        padding: 16px;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 15px;
+      }
+
+      .result-ok {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #28a745;
+      }
+
+      .result-suspect {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffc107;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="app-container">
-        <!-- TELA: LOGIN -->
-        <div id="screen-login" class="screen active">
-            <div class="auth-screen">
-                <div class="avatar-circle"></div>
-                <div class="input-group"><input type="email" placeholder="Email" value="katiana@ifpe.br"></div>
-                <div class="input-group"><input type="password" placeholder="Senha" value="********"></div>
-                <div class="forgot-pass">Esqueceu a senha?</div>
-                <button class="btn-blue" onclick="nav('home')">LOGIN</button>
-                <div class="register-link" onclick="nav('cadastro')">Não possui cadastro? Cadastre-se aqui!</div>
-            </div>
-            <div class="ifpe-footer-bg"></div>
+      <!-- TELA: LOGIN -->
+      <div id="screen-login" class="screen active">
+        <div class="auth-screen">
+          <div class="avatar-circle"></div>
+          <div class="input-group">
+            <input type="email" placeholder="Email" value="katiana@ifpe.br" />
+          </div>
+          <div class="input-group">
+            <input type="password" placeholder="Senha" value="********" />
+          </div>
+          <div class="forgot-pass">Esqueceu a senha?</div>
+          <button class="btn-blue" onclick="nav('home')">LOGIN</button>
+          <div class="register-link" onclick="nav('cadastro')">
+            Não possui cadastro? Cadastre-se aqui!
+          </div>
         </div>
+        <div class="ifpe-footer-bg"></div>
+      </div>
 
-        <!-- TELA: HOME -->
-        <div id="screen-home" class="screen">
-            <div class="top-header">
-                <h1>Presença e Companhia</h1>
-                <div class="subtitle">Seja bem vind@, Katiana!!</div>
-            </div>
-            <div class="content-area" style="background-color: #d1d8e0;">
-                <div class="date-box">$17/17/17$</div>
-                
-                <!-- Botão Novo Adicionado para o Fluxo de Check-in -->
-                <button class="btn-scan" onclick="startCheckin()">
-                    [+] REGISTRAR PRESENÇA (QR CODE)
-                </button>
-
-                <h2 class="home-title">Plano de hoje:</h2>
-                <div class="class-card"><h3>Empreendedorismo - 3B</h3><p>7:15 ~ 9:30</p></div>
-                <div class="class-card"><h3>Empreendedorismo - 3A</h3><p>9:45 ~ 12:00</p></div>
-            </div>
-            <div class="bottom-nav">
-                <div class="nav-item" onclick="nav('login')">Sair</div>
-                <div class="nav-item" onclick="nav('turmas')">Turmas</div>
-                <div class="nav-item" onclick="nav('frequencia')">Frequência</div>
-                <div class="nav-item" onclick="nav('bibliotecas')">Bibliotecas</div>
-                <div class="nav-item" onclick="nav('planos')">Planos</div>
-            </div>
+      <!-- TELA: HOME -->
+      <div id="screen-home" class="screen">
+        <div class="top-header">
+          <h1>Pacad</h1>
+          <div class="subtitle">Seja bem vind@, Katiana!!</div>
         </div>
+        <div class="content-area" style="background-color: #d1d8e0">
+          <div class="date-box">31/08/2026</div>
 
-        <!-- TELA: FLUXO DE PRESENÇA (CHECK-IN) -->
-        <div id="screen-checkin" class="screen">
-            <div class="top-header" style="background: #222; color: #fff; border:none;">
-                <h1 style="color:#fff;">SISTEMA DE PRESENÇA</h1>
-                <div style="font-size: 12px; margin-top:5px; color:#aaa;">Modo Estrutural / Layout Analítico</div>
+          <button class="btn-scan" onclick="startCheckin()">
+            [+] REGISTRAR PRESENÇA (QR CODE)
+          </button>
+
+          <h2 class="home-title">Plano de hoje:</h2>
+          <div class="class-card">
+            <h3>Empreendedorismo - 3B</h3>
+            <p>7:15 ~ 9:30</p>
+          </div>
+          <div class="class-card">
+            <h3>Empreendedorismo - 3A</h3>
+            <p>9:45 ~ 12:00</p>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="nav('login')">Sair</div>
+          <div class="nav-item" onclick="nav('turmas')">Turmas</div>
+          <div class="nav-item" onclick="nav('frequencia')">Frequência</div>
+          <div class="nav-item" onclick="nav('bibliotecas')">Bibliotecas</div>
+          <div class="nav-item" onclick="nav('planos')">Planos</div>
+        </div>
+      </div>
+
+      <!-- TELA: FLUXO DE PRESENÇA (CHECK-IN) -->
+      <div id="screen-checkin" class="screen">
+        <div
+          class="top-header"
+          style="background: #222; color: #fff; border: none"
+        >
+          <h1 style="color: #fff">SISTEMA DE PRESENÇA</h1>
+          <div style="font-size: 12px; margin-top: 5px; color: #aaa">
+            Modo Estrutural / Layout Analítico
+          </div>
+        </div>
+        <div class="content-area" style="background-color: #f0f0f0">
+          <div class="checkin-container" id="checkin-flow-container">
+            <div class="flow-step step-1">
+              <div class="step-title">1. Captura</div>
+              <div class="step-content">
+                Lendo QR Dinâmico... <br />[ ■ ■ ■ ■ ■ ]
+              </div>
             </div>
-            <div class="content-area" style="background-color: #f0f0f0;">
-                <div class="checkin-container" id="checkin-flow-container">
-                    
-                    <div class="flow-step step-1">
-                        <div class="step-title">1. Captura</div>
-                        <div class="step-content">Lendo QR Dinâmico... <br>[ ■ ■ ■ ■ ■ ]</div>
-                    </div>
-                    
-                    <div class="flow-arrow arrow-1">↓</div>
-                    
-                    <div class="flow-step step-2">
-                        <div class="step-title">2. Identificação</div>
-                        <div class="step-content">
-                            <div class="check-item"><span>Usuário Identificado</span><span class="status">[ OK ]</span></div>
-                            <div class="check-item"><span>Dispositivo Cadastrado</span><span class="status">[ OK ]</span></div>
-                        </div>
-                    </div>
 
-                    <div class="flow-arrow arrow-2">↓</div>
+            <div class="flow-arrow arrow-1">↓</div>
 
-                    <div class="flow-step step-3">
-                        <div class="step-title">3. Verificação de Contexto</div>
-                        <div class="step-content">
-                            <div class="check-item"><span>BLE da sala (Bluetooth)</span><span class="status" id="chk-ble">...</span></div>
-                            <div class="check-item"><span>Wi-Fi da escola</span><span class="status" id="chk-wifi">...</span></div>
-                            <div class="check-item"><span>GPS / Localização</span><span class="status" id="chk-gps">...</span></div>
-                        </div>
-                    </div>
-
-                    <div class="flow-arrow arrow-3">↓</div>
-
-                    <div class="flow-step step-4">
-                        <div class="step-title">4. Score de Confiança</div>
-                        <div class="score-box" id="score-val">Calculando...</div>
-                    </div>
-
-                    <div class="flow-arrow arrow-4">↓</div>
-
-                    <div class="flow-step step-5" style="border:none; padding:0; background:transparent;">
-                        <div class="result-box result-ok" id="final-result" style="display:none;">
-                            PRESENTE CONFIRMADO
-                        </div>
-                        <div class="result-box result-suspect" id="suspect-result" style="display:none;">
-                            SUSPEITO → PROFESSOR REVISA
-                        </div>
-                    </div>
-
+            <div class="flow-step step-2">
+              <div class="step-title">2. Identificação</div>
+              <div class="step-content">
+                <div class="check-item">
+                  <span>Usuário Identificado</span
+                  ><span class="status">[ OK ]</span>
                 </div>
-                <button onclick="nav('home')" style="width:100%; padding:10px; margin-top:20px; background:#ddd; border:1px solid #aaa; cursor:pointer;">VOLTAR</button>
+                <div class="check-item">
+                  <span>Dispositivo Cadastrado</span
+                  ><span class="status">[ OK ]</span>
+                </div>
+              </div>
             </div>
-        </div>
 
-        <!-- Demais telas omitidas no HTML para focar no código pedido, mas o JS nav() funciona normal se precisarmos plugar -->
-        <div id="screen-turmas" class="screen"><div class="top-header blue-header"><h1>Presença e Companhia</h1><div class="subtitle">Turmas</div></div><div class="content-area"><div style="text-align:center; padding:20px;">[Tela de Turmas Vazia para simplificar o protótipo V3]</div></div><div class="bottom-nav"><div class="nav-item" onclick="nav('home')">Início</div></div></div>
-        <div id="screen-frequencia" class="screen"><div class="top-header blue-header"><h1>Presença e Companhia</h1><div class="subtitle">Frequência</div></div><div class="content-area"><div style="text-align:center; padding:20px;">[Tela de Frequência]</div></div><div class="bottom-nav"><div class="nav-item" onclick="nav('home')">Início</div></div></div>
-        <div id="screen-bibliotecas" class="screen"><div class="top-header blue-header"><h1>Presença e Companhia</h1><div class="subtitle">Bibliotecas</div></div><div class="content-area"><div style="text-align:center; padding:20px;">[Tela de Bibliotecas]</div></div><div class="bottom-nav"><div class="nav-item" onclick="nav('home')">Início</div></div></div>
-        <div id="screen-planos" class="screen"><div class="top-header blue-header"><h1>Presença e Companhia</h1><div class="subtitle">Planos</div></div><div class="content-area"><div style="text-align:center; padding:20px;">[Tela de Planos]</div></div><div class="bottom-nav"><div class="nav-item" onclick="nav('home')">Início</div></div></div>
+            <div class="flow-arrow arrow-2">↓</div>
+
+            <div class="flow-step step-3">
+              <div class="step-title">3. Verificação de Contexto</div>
+              <div class="step-content">
+                <div class="check-item">
+                  <span>BLE da sala (Bluetooth)</span
+                  ><span class="status" id="chk-ble">...</span>
+                </div>
+                <div class="check-item">
+                  <span>Wi-Fi da escola</span
+                  ><span class="status" id="chk-wifi">...</span>
+                </div>
+                <div class="check-item">
+                  <span>GPS / Localização</span
+                  ><span class="status" id="chk-gps">...</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-arrow arrow-3">↓</div>
+
+            <div class="flow-step step-4">
+              <div class="step-title">4. Score de Confiança</div>
+              <div class="score-box" id="score-val">Calculando...</div>
+            </div>
+
+            <div class="flow-arrow arrow-4">↓</div>
+
+            <div
+              class="flow-step step-5"
+              style="border: none; padding: 0; background: transparent"
+            >
+              <div
+                class="result-box result-ok"
+                id="final-result"
+                style="display: none"
+              >
+                PRESENTE CONFIRMADO
+              </div>
+              <div
+                class="result-box result-suspect"
+                id="suspect-result"
+                style="display: none"
+              >
+                SUSPEITO → PROFESSOR REVISA
+              </div>
+            </div>
+          </div>
+          <button
+            onclick="nav('home')"
+            style="
+              width: 100%;
+              padding: 10px;
+              margin-top: 20px;
+              background: #ddd;
+              color: #333;
+              border: 1px solid #aaa;
+              cursor: pointer;
+            "
+          >
+            VOLTAR
+          </button>
+        </div>
+      </div>
+
+      <div id="screen-turmas" class="screen">
+        <div class="top-header blue-header">
+          <h1>Pacad</h1>
+          <div class="subtitle">Turmas</div>
+        </div>
+        <div class="content-area">
+          <div style="text-align: center; padding: 20px">
+            [Tela de Turmas Vazia para simplificar o protótipo V3]
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="nav('home')">Início</div>
+        </div>
+      </div>
+      <div id="screen-frequencia" class="screen">
+        <div class="top-header blue-header">
+          <h1>Pacad</h1>
+          <div class="subtitle">Frequência</div>
+        </div>
+        <div class="content-area">
+          <div style="text-align: center; padding: 20px">
+            [Tela de Frequência]
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="nav('home')">Início</div>
+        </div>
+      </div>
+      <div id="screen-bibliotecas" class="screen">
+        <div class="top-header blue-header">
+          <h1>Pacad</h1>
+          <div class="subtitle">Bibliotecas</div>
+        </div>
+        <div class="content-area">
+          <div style="text-align: center; padding: 20px">
+            [Tela de Bibliotecas]
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="nav('home')">Início</div>
+        </div>
+      </div>
+      <div id="screen-planos" class="screen">
+        <div class="top-header blue-header">
+          <h1>Pacad</h1>
+          <div class="subtitle">Planos</div>
+        </div>
+        <div class="content-area">
+          <div style="text-align: center; padding: 20px">[Tela de Planos]</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="nav('home')">Início</div>
+        </div>
+      </div>
     </div>
 
     <script>
-        function nav(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-' + screenId).classList.add('active');
+      function nav(screenId) {
+        const target = document.getElementById("screen-" + screenId);
+        if (!target) {
+          console.warn("Tela inexistente:", screenId);
+          return;
         }
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        target.classList.add("active");
+      }
 
-        // Simulação do Fluxo de Check-in em etapas
-        function startCheckin() {
-            nav('checkin');
-            
-            // Resetar UI
-            document.querySelectorAll('.flow-step, .flow-arrow').forEach(el => el.classList.remove('visible'));
-            document.getElementById('chk-ble').innerText = '...';
-            document.getElementById('chk-wifi').innerText = '...';
-            document.getElementById('chk-gps').innerText = '...';
-            document.getElementById('score-val').innerText = 'Calculando...';
-            document.getElementById('final-result').style.display = 'none';
-            document.getElementById('suspect-result').style.display = 'none';
+      function startCheckin() {
+        nav("checkin");
 
-            // Passo 1
-            setTimeout(() => { document.querySelector('.step-1').classList.add('visible'); }, 500);
-            
-            // Passo 2
-            setTimeout(() => { 
-                document.querySelector('.arrow-1').classList.add('visible'); 
-                document.querySelector('.step-2').classList.add('visible'); 
-            }, 1500);
-            
-            // Passo 3
-            setTimeout(() => { 
-                document.querySelector('.arrow-2').classList.add('visible'); 
-                document.querySelector('.step-3').classList.add('visible'); 
-            }, 2500);
-            
-            // Atualizar status do passo 3 progressivamente
-            setTimeout(() => { document.getElementById('chk-ble').innerText = '[ OK ]'; }, 3000);
-            setTimeout(() => { document.getElementById('chk-wifi').innerText = '[ OK ]'; }, 3500);
-            setTimeout(() => { document.getElementById('chk-gps').innerText = '[ FALHA ]'; }, 4000); // Simulando uma falha no GPS
+        document
+          .querySelectorAll(".flow-step, .flow-arrow")
+          .forEach((el) => el.classList.remove("visible"));
+        document.getElementById("chk-ble").innerText = "...";
+        document.getElementById("chk-wifi").innerText = "...";
+        document.getElementById("chk-gps").innerText = "...";
+        document.getElementById("score-val").innerText = "Calculando...";
+        document.getElementById("final-result").style.display = "none";
+        document.getElementById("suspect-result").style.display = "none";
 
-            // Passo 4 - Score
-            setTimeout(() => { 
-                document.querySelector('.arrow-3').classList.add('visible'); 
-                document.querySelector('.step-4').classList.add('visible'); 
-                document.getElementById('score-val').innerText = 'SCORE: 65% (Suspeito)';
-                document.getElementById('score-val').style.color = '#555';
-            }, 5000);
+        setTimeout(() => {
+          document.querySelector(".step-1").classList.add("visible");
+        }, 500);
 
-            // Passo 5 - Resultado
-            setTimeout(() => { 
-                document.querySelector('.arrow-4').classList.add('visible'); 
-                document.querySelector('.step-5').classList.add('visible'); 
-                
-                // Como falhou no GPS, cai na regra de revisão do professor
-                document.getElementById('suspect-result').style.display = 'block';
-            }, 6000);
-        }
+        setTimeout(() => {
+          document.querySelector(".arrow-1").classList.add("visible");
+          document.querySelector(".step-2").classList.add("visible");
+        }, 1500);
+
+        setTimeout(() => {
+          document.querySelector(".arrow-2").classList.add("visible");
+          document.querySelector(".step-3").classList.add("visible");
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("chk-ble").innerText = "[ OK ]";
+        }, 3000);
+        setTimeout(() => {
+          document.getElementById("chk-wifi").innerText = "[ OK ]";
+        }, 3500);
+        setTimeout(() => {
+          document.getElementById("chk-gps").innerText = "[ FALHA ]";
+        }, 4000);
+
+        setTimeout(() => {
+          document.querySelector(".arrow-3").classList.add("visible");
+          document.querySelector(".step-4").classList.add("visible");
+          document.getElementById("score-val").innerText =
+            "SCORE: 65% (Suspeito)";
+          document.getElementById("score-val").style.color = "#555";
+        }, 5000);
+
+        setTimeout(() => {
+          document.querySelector(".arrow-4").classList.add("visible");
+          document.querySelector(".step-5").classList.add("visible");
+          document.getElementById("suspect-result").style.display = "block";
+        }, 6000);
+      }
     </script>
-</body>
+  </body>
 </html>
